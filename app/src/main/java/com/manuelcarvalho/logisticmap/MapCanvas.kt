@@ -20,8 +20,13 @@ class MapCanvas(context: Context) : View(context) {
     private var touchX = 0.0f
     private var touchY = 0.0f
 
+    private val mult = 2.6
+
     private var canvasHeight = 0
     private var canvasWidth = 0
+
+    private var startX = 0.0
+    private var startY = 0.0
 
     private val backgroundColor =
         ResourcesCompat.getColor(resources, R.color.canvasBackground, null)
@@ -31,7 +36,7 @@ class MapCanvas(context: Context) : View(context) {
     private val paint = Paint().apply {
         color = drawColor
         style = Paint.Style.STROKE
-        strokeWidth = 5f
+        strokeWidth = 2f
         textSize = 20f
     }
 
@@ -45,6 +50,8 @@ class MapCanvas(context: Context) : View(context) {
         extraBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
         extraCanvas = Canvas(extraBitmap)
         extraCanvas.drawColor(backgroundColor)
+
+        generatePoints()
     }
 
     override fun onDraw(canvas: Canvas?) {
@@ -57,14 +64,32 @@ class MapCanvas(context: Context) : View(context) {
         touchX = event.x
         touchY = event.y
 
-        for (x in -canvasWidth..canvasWidth) {
-            Log.d(TAG, " $x")
-            val x1 = x * touchX / 10
-
-        }
-
-        invalidate()
 
         return true
     }
+
+    fun generatePoints() {
+        var r = 2.6
+        var x = 0.4
+        for (n in 1..20000) {
+            x = r * x * (1 - x) / 1.2
+            r += .0001
+            displayRealPoint(r, x)
+        }
+
+        invalidate()
+    }
+
+
+    fun displayRealPoint(x: Double, y: Double) {
+
+        var x1 = (((x - 2.6) * 450.0)) * 1.1
+        var y1 = (y * 1500.0)
+        extraCanvas.drawPoint(x1.toFloat(), y1.toFloat(), paint)
+
+        startX = x
+        startY = y
+        Log.d(TAG, "xy = ${x1} ${y1}")
+    }
+
 }
